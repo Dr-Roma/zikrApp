@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  bool activity = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,36 +35,54 @@ class Home extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 30,
-                            width: 134,
-                            decoration: const BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              color: Color.fromARGB(255, 2, 75, 202),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Activity',
-                                style: TextStyle(color: Colors.white),
+                          InkWell(
+                            onTap: () {
+                              activity = true;
+                              setState(() {});
+                            },
+                            child: Container(
+                              height: 30,
+                              width: 134,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
+                                color: activity
+                                    ? const Color.fromARGB(255, 2, 75, 202)
+                                    : Colors.white,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Activity',
+                                  style: TextStyle(
+                                      color: activity
+                                          ? Colors.white
+                                          : Colors.black),
+                                ),
                               ),
                             ),
                           ),
                           InkWell(
                             onTap: () {
-                              Navigator.of(context).pushNamed('/saved');
+                              activity = false;
+                              setState(() {});
                             },
                             child: Container(
                               height: 30,
                               width: 134,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                color: Colors.white,
+                                    const BorderRadius.all(Radius.circular(10)),
+                                color: activity
+                                    ? Colors.white
+                                    : const Color.fromARGB(255, 2, 75, 202),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   'Saved',
+                                  style: TextStyle(
+                                      color: activity
+                                          ? Colors.black
+                                          : Colors.white),
                                 ),
                               ),
                             ),
@@ -81,28 +105,35 @@ class Home extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Counter(),
-              const SizedBox(
-                height: 15,
-              ),
-              Container(
-                height: 45,
-                width: MediaQuery.of(context).size.width,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: Colors.white,
-                ),
-                child: const Center(
-                  child: Text(
-                    'Save dhikr',
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 2, 75, 202), fontSize: 16),
-                  ),
-                ),
-              ),
+              activity
+                  ? Column(
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Counter(),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Container(
+                          height: 45,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            color: Colors.white,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Save dhikr',
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 2, 75, 202),
+                                  fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
               const SizedBox(
                 height: 15,
               ),
