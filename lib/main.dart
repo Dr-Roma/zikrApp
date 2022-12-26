@@ -12,7 +12,6 @@ void main() {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Gilroy'),
       routes: {
-        //'/': (context) => const Loading(),
         '/home': (context) => const Home(),
         '/settings': (context) => const Settings(),
       },

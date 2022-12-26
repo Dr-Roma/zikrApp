@@ -115,19 +115,55 @@ class _HomeState extends State<Home> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Container(
-                          height: 45,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            color: Colors.white,
+                        InkWell(
+                          onTap: () => showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Save dhikr'),
+                              content: const TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Please enter a title Dhikr',
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.grey),
+                                  ),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Cancel'),
+                                  child: const Text(
+                                    'Cancel',
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Save'),
+                                  child: const Text(
+                                    'Save',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: const Center(
-                            child: Text(
-                              'Save dhikr',
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 2, 75, 202),
-                                  fontSize: 16),
+                          child: Container(
+                            height: 45,
+                            width: MediaQuery.of(context).size.width,
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: Colors.white,
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Save dhikr',
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 2, 75, 202),
+                                    fontSize: 16),
+                              ),
                             ),
                           ),
                         ),
@@ -179,7 +215,7 @@ class _HomeState extends State<Home> {
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 350,
+                height: activity ? 350 : 650,
                 decoration: const BoxDecoration(
                   borderRadius:
                       BorderRadius.vertical(bottom: Radius.circular(10)),
@@ -387,30 +423,32 @@ class _CounterState extends State<Counter> {
     super.initState();
   }
 
-  Future<void> counterMinus() async {
+  Future<void> metod() async {
+    final SharedPreferences prefsSave = await prefs;
+    prefsSave.setInt(keyCounter, counter);
+  }
+
+  void counterMinus() {
     if (counter > 0) {
-      final SharedPreferences prefsSave = await prefs;
       counter--;
-      prefsSave.setInt(keyCounter, counter);
       setState(() {});
     }
+    metod();
   }
 
-  Future<void> counterIncrement() async {
-    final SharedPreferences prefsSave = await prefs;
+  void counterIncrement() {
     counter++;
-    prefsSave.setInt(keyCounter, counter);
     setState(() {});
+    metod();
   }
 
-  Future<void> counterRestart() async {
+  void counterRestart() {
     if (counter > 0) {
-      final SharedPreferences prefsSave = await prefs;
       setState(() {
         counter = 0;
-        prefsSave.setInt(keyCounter, counter);
       });
     }
+    metod();
   }
 
   @override
