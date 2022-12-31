@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/home.dart';
+import 'screens/home/home.dart';
 //import 'screens/loading.dart';
 // import 'screens/saved.dart';
 import 'screens/settings.dart';
