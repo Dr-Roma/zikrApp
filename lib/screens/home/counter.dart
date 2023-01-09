@@ -1,65 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class Counter extends StatefulWidget {
+class Counter extends StatelessWidget {
+  final int counter;
+  final Function increment;
+  final Function decrement;
+  final Function zeroing;
+
   const Counter({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<Counter> createState() => _CounterState();
-}
-
-class _CounterState extends State<Counter> {
-  final Future<SharedPreferences> prefs = SharedPreferences
-      .getInstance(); //создаем экземпляр SharedPreferences.getInstance()
-  final String keyCounter = 'counter';
-  int counter = 0;
-
-  Future<void> instanceDb() async {
-    final SharedPreferences prefsSave = await prefs;
-
-    if (prefsSave.getInt(keyCounter) == null) {
-      prefsSave.setInt(keyCounter, 0);
-    } else {
-      counter = prefsSave.getInt(keyCounter)!;
-    }
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    instanceDb();
-    super.initState();
-  }
-
-  Future<void> metod() async {
-    final SharedPreferences prefsSave = await prefs;
-    prefsSave.setInt(keyCounter, counter);
-  }
-
-  void counterMinus() {
-    if (counter > 0) {
-      counter--;
-      setState(() {});
-    }
-    metod();
-  }
-
-  void counterIncrement() {
-    counter++;
-    setState(() {});
-    metod();
-  }
-
-  void counterRestart() {
-    if (counter > 0) {
-      setState(() {
-        counter = 0;
-      });
-    }
-    metod();
-  }
+    required this.counter,
+    required this.decrement,
+    required this.increment,
+    required this.zeroing,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +29,7 @@ class _CounterState extends State<Counter> {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: const Color.fromARGB(255, 2, 75, 202),
             child: InkWell(
-              onTap: () => counterMinus(),
+              onTap: () => decrement(),
               child: const SizedBox(
                   height: 35,
                   width: 35,
@@ -95,7 +48,7 @@ class _CounterState extends State<Counter> {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: const Color.fromARGB(255, 2, 75, 202),
             child: InkWell(
-              onTap: () => counterIncrement(),
+              onTap: () => increment(),
               child: SizedBox(
                   height: 154,
                   width: 154,
@@ -129,7 +82,7 @@ class _CounterState extends State<Counter> {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: const Color.fromARGB(255, 2, 75, 202),
             child: InkWell(
-              onTap: () => counterRestart(),
+              onTap: () => zeroing(),
               child: const SizedBox(
                   height: 35,
                   width: 35,

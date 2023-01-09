@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/home/saves.dart';
+import 'package:flutter_application_1/screens/home/savesHive.dart';
+import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../models/zikr.dart';
 import 'counter.dart';
+//import 'package:intl/intl.dart';
+
+final List<Zikr> zikrs = [
+  Zikr(dateTime: DateTime.now(), counter: 11, title: 'Первый'),
+];
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -11,8 +19,63 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool activity = true;
+  final Future<SharedPreferences> prefs = SharedPreferences
+      .getInstance(); //создаем экземпляр SharedPreferences.getInstance()
+  final String keyCounter = 'counter';
+  int counter = 0;
+  String titleZikr = '';
+
+  late Box<Zikr> savesZikrs;
+
+  Future<void> instanceDb() async {
+    final SharedPreferences prefsSave = await prefs;
+
+    if (prefsSave.getInt(keyCounter) == null) {
+      prefsSave.setInt(keyCounter, 0);
+    } else {
+      counter = prefsSave.getInt(keyCounter)!;
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    instanceDb();
+    savesZikrs = Hive.box<Zikr>('zikrs');
+    super.initState();
+  }
+
+  Future<void> metod() async {
+    final SharedPreferences prefsSave = await prefs;
+    prefsSave.setInt(keyCounter, counter);
+  }
+
+  void decrement() {
+    if (counter > 0) {
+      counter--;
+      setState(() {});
+    }
+    metod();
+  }
+
+  void increment() {
+    counter++;
+    setState(() {});
+    metod();
+  }
+
+  void zeroing() {
+    if (counter > 0) {
+      setState(() {
+        counter = 0;
+      });
+    }
+    metod();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final widthScreen = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 249, 246, 246),
       body: SafeArea(
@@ -112,7 +175,12 @@ class _HomeState extends State<Home> {
                         const SizedBox(
                           height: 20,
                         ),
-                        const Counter(),
+                        Counter(
+                          counter: counter,
+                          decrement: decrement,
+                          increment: increment,
+                          zeroing: zeroing,
+                        ),
                         const SizedBox(
                           height: 15,
                         ),
@@ -121,8 +189,11 @@ class _HomeState extends State<Home> {
                             context: context,
                             builder: (BuildContext context) => AlertDialog(
                               title: const Text('Save dhikr'),
-                              content: const TextField(
-                                decoration: InputDecoration(
+                              content: TextField(
+                                onChanged: (value) {
+                                  titleZikr = value;
+                                },
+                                decoration: const InputDecoration(
                                   hintText: 'Please enter a title Dhikr',
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -139,8 +210,14 @@ class _HomeState extends State<Home> {
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, 'Save'),
+                                  onPressed: () {
+                                    savesZikrs.add(Zikr(
+                                        dateTime: DateTime.now(),
+                                        counter: counter,
+                                        title: titleZikr));
+                                    Navigator.pop(context, 'Save');
+                                    setState(() {});
+                                  },
                                   child: const Text(
                                     'Save',
                                     style:
@@ -174,7 +251,7 @@ class _HomeState extends State<Home> {
               const SizedBox(
                 height: 15,
               ),
-              const Expanded(child: Saves())
+              SavesHive(widthScreen: widthScreen, savesZikrs: savesZikrs),
             ],
           ),
         ),
@@ -182,3 +259,16 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+
+
+//  Expanded(
+//                 child: Column(
+//                   children: [
+//                     Text(savesZikrs.length.toString()),
+//                     Text(savesZikrs.values.toList()[0].title),
+//                   ],
+//                 ),
+
+//                 //Saves()
+//               )
