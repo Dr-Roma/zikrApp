@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/home/savesHive.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/zikr.dart';
@@ -163,7 +164,8 @@ class _HomeState extends State<Home> {
                         ),
                         child: IconButton(
                             onPressed: () {
-                              Navigator.of(context).pushNamed('/settings');
+                              //Navigator.of(context).pushNamed('/settings');
+                              context.go('/settings');
                             },
                             icon: const Icon(Icons.menu))),
                   ],

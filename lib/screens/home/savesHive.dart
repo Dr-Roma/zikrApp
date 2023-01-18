@@ -10,7 +10,7 @@ class SavesHive extends StatelessWidget {
   const SavesHive({
     Key? key,
     required this.widthScreen,
-    required this.savesZikrs,
+    required this.savesZikrs, 
   }) : super(key: key);
 
   final double widthScreen;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -32,7 +33,8 @@ class SettingsPage extends State<Settings> {
                         ),
                         child: IconButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              //Navigator.of(context).pop();
+                              context.go('/');
                             },
                             icon: const Icon(
                               Icons.close,

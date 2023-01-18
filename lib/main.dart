@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/service/zikr_hive_adapter.dart';
+import 'package:go_router/go_router.dart';
 // ignore: unnecessary_import
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,6 +11,25 @@ import 'screens/home/home.dart';
 import 'screens/settings.dart';
 // ignore: unused_import
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const Home();
+      },
+      routes: <RouteBase>[
+        GoRoute(
+          path: 'settings',
+          builder: (BuildContext context, GoRouterState state) {
+            return const Settings();
+          },
+        ),
+      ],
+    ),
+  ],
+);
 
 //Hive
 //!Все базы данных могут сохранять простые типы данных (int, String и тд)
@@ -28,14 +48,10 @@ void main() async {
   await Hive.openBox<Zikr>('zikrs');
 
   runApp(
-    MaterialApp(
+    MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Gilroy'),
-      routes: {
-        '/home': (context) => const Home(),
-        '/settings': (context) => const Settings(),
-      },
-      initialRoute: '/home',
+      routerConfig: _router,
     ),
   );
 }
