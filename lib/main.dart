@@ -2,21 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/service/zikr_hive_adapter.dart';
 import 'package:go_router/go_router.dart';
-// ignore: unnecessary_import
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-// ignore: unused_import
-import 'package:intl/date_symbol_data_file.dart';
-// ignore: unused_import
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'generated/codegen_loader.g.dart';
 import 'models/zikr.dart';
 import 'screens/home/home.dart';
-//import 'screens/loading.dart';
-// import 'screens/saved.dart';
 import 'screens/settings.dart';
-// ignore: unused_import
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
@@ -55,7 +47,7 @@ void main() async {
   }
 
   //Создал бокс с ключом , сюда все сохраняться будет
-  await Hive.openBox<Zikr>('zikrs');
+  // await Hive.openBox<Zikr>('zikrs'); лучше всего хайв открывать в момент сохранения
 
   runApp(EasyLocalization(
     supportedLocales: const [Locale('en'), Locale('ru')],
@@ -73,28 +65,119 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(fontFamily: 'Gilroy'),
-      routerConfig: _router,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
+    return ChangeNotifierProvider(
+      create: (context) => ProviderZikr(),
+      lazy: false,
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(fontFamily: 'Gilroy'),
+        routerConfig: _router,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
 
-      // home: const Home();
+        // home: const Home();
+      ),
     );
   }
 }
 
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
+class ProviderZikr extends ChangeNotifier {
+  final Future<SharedPreferences> prefs = SharedPreferences
+      .getInstance(); //создаем экземпляр SharedPreferences.getInstance()
+  bool activity = true;
+  final String keyCounter = 'counter';
+  int counter = 0;
+  String titleZikr = '';
+  bool loadingProvider = true;
+  late Box<Zikr> savesZikrs;
+  //  Future<void> openBox() async {
+  //   _box = await Hive.openBox('myBox');
+  //   notifyListeners();
+  // }
+  List<Zikr> listSaveZikrsFromHive = [];
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//         localizationsDelegates: context.localizationDelegates,
-//         supportedLocales: context.supportedLocales,
-//         locale: context.locale,
-//         home: const Home());
-//   }
-// }
+  ProviderZikr() {
+    preloadData();
+  }
+
+  Future<void> preloadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey(keyCounter)) counter = prefs.getInt(keyCounter)!;
+
+    preloadZikrsFromHive();
+    loadingProvider = false;
+
+    notifyListeners(); //обнавляет информацию на экране как setState, стейтлесс или стейтфул не важно обнавляет
+  }
+
+  Future<void> saveZikrToHive(Zikr zikr) async {
+    await Hive.openBox<Zikr>('zikrs');
+    Box<Zikr> boxZikrs = Hive.box<Zikr>('zikrs');
+    boxZikrs.add(zikr);
+    notifyListeners();
+  }
+
+  Future<void> preloadZikrsFromHive() async {
+    await Hive.openBox<Zikr>('zikrs'); //открыл базу
+    Box<Zikr> boxZikrs = Hive.box<Zikr>('zikrs'); //открыл нужную коробку
+    listSaveZikrsFromHive = boxZikrs.values
+        .toList(); //из коробки вытащил все переменные и превратил на лист, потом все это засунул в listSaveZikrsFromHive
+    notifyListeners();
+  }
+
+  void toggleActivity(bool boolevo) {
+    if (boolevo != activity) {
+      activity = boolevo;
+      notifyListeners();
+    }
+  }
+
+  void pushCount(int count) async {
+    counter = count;
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt(keyCounter, counter);
+    notifyListeners();
+  }
+
+  void delete(index) async {
+    //удаляет по индексу по одному
+    final savesZikr = Hive.box<Zikr>('zikrs');
+    await savesZikr.deleteAt(index);
+    //notifyListeners();
+  }
+
+  // @override
+  // void initState() {
+  //   instanceDb();
+  //   savesZikrs = Hive.box<Zikr>('zikrs');
+  //   super.initState();
+  // }
+
+  Future<void> metod() async {
+    final SharedPreferences prefsSave = await prefs;
+    prefsSave.setInt(keyCounter, counter);
+  }
+
+  void decrement() {
+    if (counter > 0) {
+      counter--;
+      notifyListeners();
+    }
+    metod();
+  }
+
+  void increment() {
+    counter++;
+    notifyListeners();
+    metod();
+  }
+
+  void zeroing() {
+    if (counter > 0) {
+      counter = 0;
+    }
+    metod();
+    notifyListeners();
+  }
+}
