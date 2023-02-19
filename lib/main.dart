@@ -29,25 +29,14 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-//Hive
-//!Все базы данных могут сохранять простые типы данных (int, String и тд)
-//по умолчанию Hive не умеют наши модели сохранять (сложные типы данных как наши классы User, Zikr и тд)
-//Для сохранения сложные типы данных в Hive нужен АДАПТЕР( то есть его надо научит)
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  // ignore: unused_local_variable
-  var initializeDateFormatting = [const Locale('en'), const Locale('ru')];
-  //Инициялизируем Hive
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  //Регистрируем адаптер для Hive, чтобы сохранять свои Объекты
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(ZikrHiveAdapter());
   }
-
-  //Создал бокс с ключом , сюда все сохраняться будет
-  // await Hive.openBox<Zikr>('zikrs'); лучше всего хайв открывать в момент сохранения
 
   runApp(EasyLocalization(
     supportedLocales: const [Locale('en'), Locale('ru')],
@@ -75,26 +64,18 @@ class MyApp extends StatelessWidget {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-
-        // home: const Home();
       ),
     );
   }
 }
 
 class ProviderZikr extends ChangeNotifier {
-  final Future<SharedPreferences> prefs = SharedPreferences
-      .getInstance(); //создаем экземпляр SharedPreferences.getInstance()
+  final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   bool activity = true;
   final String keyCounter = 'counter';
   int counter = 0;
-  String titleZikr = '';
   bool loadingProvider = true;
   late Box<Zikr> savesZikrs;
-  //  Future<void> openBox() async {
-  //   _box = await Hive.openBox('myBox');
-  //   notifyListeners();
-  // }
   List<Zikr> listSaveZikrsFromHive = [];
 
   ProviderZikr() {
@@ -108,7 +89,7 @@ class ProviderZikr extends ChangeNotifier {
     preloadZikrsFromHive();
     loadingProvider = false;
 
-    notifyListeners(); //обнавляет информацию на экране как setState, стейтлесс или стейтфул не важно обнавляет
+    notifyListeners();
   }
 
   Future<void> saveZikrToHive(Zikr zikr) async {
@@ -119,10 +100,9 @@ class ProviderZikr extends ChangeNotifier {
   }
 
   Future<void> preloadZikrsFromHive() async {
-    await Hive.openBox<Zikr>('zikrs'); //открыл базу
-    Box<Zikr> boxZikrs = Hive.box<Zikr>('zikrs'); //открыл нужную коробку
-    listSaveZikrsFromHive = boxZikrs.values
-        .toList(); //из коробки вытащил все переменные и превратил на лист, потом все это засунул в listSaveZikrsFromHive
+    await Hive.openBox<Zikr>('zikrs');
+    Box<Zikr> boxZikrs = Hive.box<Zikr>('zikrs');
+    listSaveZikrsFromHive = boxZikrs.values.toList();
     notifyListeners();
   }
 
@@ -141,18 +121,9 @@ class ProviderZikr extends ChangeNotifier {
   }
 
   void delete(index) async {
-    //удаляет по индексу по одному
     final savesZikr = Hive.box<Zikr>('zikrs');
     await savesZikr.deleteAt(index);
-    //notifyListeners();
   }
-
-  // @override
-  // void initState() {
-  //   instanceDb();
-  //   savesZikrs = Hive.box<Zikr>('zikrs');
-  //   super.initState();
-  // }
 
   Future<void> metod() async {
     final SharedPreferences prefsSave = await prefs;
