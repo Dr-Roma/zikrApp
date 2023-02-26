@@ -1,0 +1,23 @@
+{
+"activity":"Activity",
+"saved":"Saved",
+"dhikr":"Dhikr",
+"saveDhikr":"Save dhikr",
+"pleaseEnterAtTitleDhikr":"Please enter a title Dhikr",
+"cancel":"Cancel",
+"save":"Save",
+"language":"Language",
+"vibration":"Vibration",
+"sound":"Sound",
+"countAsVolumeKeys":"Count as volume keys",
+"on":"On",
+"off":"Off",
+"editPost":"Edit post",
+"continue1":"Continue",
+"changeQuantity":"Change quantity",
+"changeName":"Change name",
+"saveChanges":"Save changes",
+"deleteEntry":"Delete entry",
+"settings":"Settings",
+"lastSavedDhikr":"Last saved dhikrs"
+}

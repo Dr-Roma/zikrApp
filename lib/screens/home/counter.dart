@@ -1,21 +1,22 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/generated/locale_keys.g.dart';
+import 'package:flutter_application_1/main.dart';
+import 'package:provider/provider.dart';
 
-class Counter extends StatelessWidget {
-  final int counter;
-  final Function increment;
-  final Function decrement;
-  final Function zeroing;
-
+class Counter extends StatefulWidget {
   const Counter({
-    required this.counter,
-    required this.decrement,
-    required this.increment,
-    required this.zeroing,
     super.key,
   });
 
   @override
+  State<Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  @override
   Widget build(BuildContext context) {
+    final provider = context.read<ProviderZikr>();
     return Container(
       height: 202,
       width: MediaQuery.of(context).size.width,
@@ -29,7 +30,7 @@ class Counter extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: const Color.fromARGB(255, 2, 75, 202),
             child: InkWell(
-              onTap: () => decrement(),
+              onTap: () => provider.decrement(),
               child: const SizedBox(
                   height: 35,
                   width: 35,
@@ -48,7 +49,12 @@ class Counter extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: const Color.fromARGB(255, 2, 75, 202),
             child: InkWell(
-              onTap: () => increment(),
+              onTap: () {
+                provider.togglePlayer
+                    ? provider.player.play(provider.currentSound)
+                    : null;
+                provider.increment();
+              },
               child: SizedBox(
                   height: 154,
                   width: 154,
@@ -58,19 +64,13 @@ class Counter extends StatelessWidget {
                       const SizedBox(
                         height: 30,
                       ),
-                      Text(
-                        counter.toString(),
-                        style: const TextStyle(
-                            fontSize: 50,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
+                      const NewWidget(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
                         child: Text(
-                          'Dhikr',
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                          LocaleKeys.dhikr.tr(),
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.white),
                           textAlign: TextAlign.end,
                         ),
                       )
@@ -82,7 +82,7 @@ class Counter extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: const Color.fromARGB(255, 2, 75, 202),
             child: InkWell(
-              onTap: () => zeroing(),
+              onTap: () => provider.zeroing(),
               child: const SizedBox(
                   height: 35,
                   width: 35,
@@ -91,6 +91,21 @@ class Counter extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class NewWidget extends StatelessWidget {
+  const NewWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final counter = context.select((ProviderZikr value) => value.counter);
+    return Text(
+      counter.toString(),
+      style: const TextStyle(
+          fontSize: 50, color: Colors.white, fontWeight: FontWeight.bold),
+      textAlign: TextAlign.center,
     );
   }
 }

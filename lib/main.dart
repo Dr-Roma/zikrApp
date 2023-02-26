@@ -1,3 +1,5 @@
+//import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/service/zikr_hive_adapter.dart';
@@ -42,6 +44,7 @@ void main() async {
     supportedLocales: const [Locale('en'), Locale('ru')],
     path: 'assets/translations',
     fallbackLocale: const Locale('en'),
+    startLocale: const Locale('en'),
     assetLoader: const CodegenLoader(),
     child: const MyApp(),
   ));
@@ -76,6 +79,10 @@ class ProviderZikr extends ChangeNotifier {
   int counter = 0;
   bool loadingProvider = true;
   late Box<Zikr> savesZikrs;
+  final player = AudioPlayer();
+  AssetSource currentSound = AssetSource('sounds/sound-1.mp3');
+  bool togglePlayer = true;
+
   List<Zikr> listSaveZikrsFromHive = [];
 
   ProviderZikr() {
@@ -111,6 +118,15 @@ class ProviderZikr extends ChangeNotifier {
       activity = boolevo;
       notifyListeners();
     }
+  }
+
+  void toggleSound(bool toggle) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    togglePlayer = toggle;
+
+    prefs.setBool('togglePlayer', togglePlayer);
+    notifyListeners();
   }
 
   void pushCount(int count) async {

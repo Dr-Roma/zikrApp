@@ -1,82 +1,23 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/generated/locale_keys.g.dart';
+import 'package:flutter_application_1/main.dart';
 import 'package:flutter_application_1/screens/home/savesHive.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive/hive.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import '../../models/zikr.dart';
 import 'counter.dart';
-//import 'package:intl/intl.dart';
 
-final List<Zikr> zikrs = [
-  Zikr(dateTime: DateTime.now(), counter: 11, title: 'Первый'),
-];
-
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  bool activity = true;
-  final Future<SharedPreferences> prefs = SharedPreferences
-      .getInstance(); //создаем экземпляр SharedPreferences.getInstance()
-  final String keyCounter = 'counter';
-  int counter = 0;
-  String titleZikr = '';
-
-  late Box<Zikr> savesZikrs;
-
-  Future<void> instanceDb() async {
-    final SharedPreferences prefsSave = await prefs;
-
-    if (prefsSave.getInt(keyCounter) == null) {
-      prefsSave.setInt(keyCounter, 0);
-    } else {
-      counter = prefsSave.getInt(keyCounter)!;
-    }
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    instanceDb();
-    savesZikrs = Hive.box<Zikr>('zikrs');
-    super.initState();
-  }
-
-  Future<void> metod() async {
-    final SharedPreferences prefsSave = await prefs;
-    prefsSave.setInt(keyCounter, counter);
-  }
-
-  void decrement() {
-    if (counter > 0) {
-      counter--;
-      setState(() {});
-    }
-    metod();
-  }
-
-  void increment() {
-    counter++;
-    setState(() {});
-    metod();
-  }
-
-  void zeroing() {
-    if (counter > 0) {
-      setState(() {
-        counter = 0;
-      });
-    }
-    metod();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final widthScreen = MediaQuery.of(context).size.width;
+    final activity = context.watch<ProviderZikr>().activity;
+    TextEditingController controller = TextEditingController();
+    final counter = context.watch<ProviderZikr>().counter;
+
+    final provaiderZikr = context.read<ProviderZikr>();
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 249, 246, 246),
       body: SafeArea(
@@ -102,8 +43,7 @@ class _HomeState extends State<Home> {
                         children: [
                           InkWell(
                             onTap: () {
-                              activity = true;
-                              setState(() {});
+                              context.read<ProviderZikr>().toggleActivity(true);
                             },
                             child: Container(
                               height: 30,
@@ -111,13 +51,13 @@ class _HomeState extends State<Home> {
                               decoration: BoxDecoration(
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(10)),
-                                color: activity
+                                color: provaiderZikr.activity
                                     ? const Color.fromARGB(255, 2, 75, 202)
                                     : Colors.white,
                               ),
                               child: Center(
                                 child: Text(
-                                  'Activity',
+                                  LocaleKeys.activity.tr(),
                                   style: TextStyle(
                                       color: activity
                                           ? Colors.white
@@ -128,8 +68,9 @@ class _HomeState extends State<Home> {
                           ),
                           InkWell(
                             onTap: () {
-                              activity = false;
-                              setState(() {});
+                              context
+                                  .read<ProviderZikr>()
+                                  .toggleActivity(false);
                             },
                             child: Container(
                               height: 30,
@@ -143,7 +84,7 @@ class _HomeState extends State<Home> {
                               ),
                               child: Center(
                                 child: Text(
-                                  'Saved',
+                                  LocaleKeys.saved.tr(),
                                   style: TextStyle(
                                       color: activity
                                           ? Colors.black
@@ -164,7 +105,6 @@ class _HomeState extends State<Home> {
                         ),
                         child: IconButton(
                             onPressed: () {
-                              //Navigator.of(context).pushNamed('/settings');
                               context.go('/settings');
                             },
                             icon: const Icon(Icons.menu))),
@@ -177,12 +117,7 @@ class _HomeState extends State<Home> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Counter(
-                          counter: counter,
-                          decrement: decrement,
-                          increment: increment,
-                          zeroing: zeroing,
-                        ),
+                        const Counter(),
                         const SizedBox(
                           height: 15,
                         ),
@@ -190,14 +125,13 @@ class _HomeState extends State<Home> {
                           onTap: () => showDialog<String>(
                             context: context,
                             builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Save dhikr'),
+                              title: Text(LocaleKeys.saveDhikr.tr()),
                               content: TextField(
-                                onChanged: (value) {
-                                  titleZikr = value;
-                                },
-                                decoration: const InputDecoration(
-                                  hintText: 'Please enter a title Dhikr',
-                                  enabledBorder: OutlineInputBorder(
+                                controller: controller,
+                                decoration: InputDecoration(
+                                  hintText:
+                                      LocaleKeys.pleaseEnterAtTitleDhikr.tr(),
+                                  enabledBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(
                                         width: 1, color: Colors.grey),
                                   ),
@@ -205,25 +139,26 @@ class _HomeState extends State<Home> {
                               ),
                               actions: <Widget>[
                                 TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, 'Cancel'),
-                                  child: const Text(
-                                    'Cancel',
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    LocaleKeys.cancel.tr(),
                                   ),
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    savesZikrs.add(Zikr(
-                                        dateTime: DateTime.now(),
-                                        counter: counter,
-                                        title: titleZikr));
-                                    Navigator.pop(context, 'Save');
-                                    setState(() {});
+                                    context.read<ProviderZikr>()
+                                      ..saveZikrToHive(Zikr(
+                                          dateTime: DateTime.now(),
+                                          counter: counter,
+                                          title: controller.text))
+                                      ..preloadZikrsFromHive()
+                                      ..zeroing();
+                                    Navigator.pop(context);
                                   },
-                                  child: const Text(
-                                    'Save',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                  child: Text(
+                                    LocaleKeys.save.tr(),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -237,10 +172,10 @@ class _HomeState extends State<Home> {
                                   BorderRadius.all(Radius.circular(10)),
                               color: Colors.white,
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                'Save dhikr',
-                                style: TextStyle(
+                                LocaleKeys.saveDhikr.tr(),
+                                style: const TextStyle(
                                     color: Color.fromARGB(255, 2, 75, 202),
                                     fontSize: 16),
                               ),
@@ -253,7 +188,7 @@ class _HomeState extends State<Home> {
               const SizedBox(
                 height: 15,
               ),
-              SavesHive(widthScreen: widthScreen, savesZikrs: savesZikrs),
+              const SavesHive()
             ],
           ),
         ),
@@ -261,16 +196,3 @@ class _HomeState extends State<Home> {
     );
   }
 }
-
-
-
-//  Expanded(
-//                 child: Column(
-//                   children: [
-//                     Text(savesZikrs.length.toString()),
-//                     Text(savesZikrs.values.toList()[0].title),
-//                   ],
-//                 ),
-
-//                 //Saves()
-//               )

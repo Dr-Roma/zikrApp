@@ -1,0 +1,23 @@
+{
+    "activity":"Активность",
+    "saved":"Сохранено",
+    "dhikr":"Зикр",
+    "saveDhikr":"Сохранить зикр",
+    "pleaseEnterAtTitleDhikr":"Пожалуйста, введите название Зикра",
+    "cancel":"Отменить",
+    "save":"Сохранить",
+    "language":"Язык",
+    "vibration":"Вибрация",
+    "sound":"Звук",
+    "countAsVolumeKeys":"Считать как клавиши громкости",
+    "on":"Вкл",
+    "off":"Выкл",
+    "editPost":"Редактировать",
+    "continue1":"Продолжить",
+    "changeQuantity":"Изменить количество",
+    "changeName":"Изменить название",
+    "saveChanges":"Сохранить изменения",
+    "deleteEntry":"Удалить запись",
+    "settings":"Настройки",
+    "lastSavedDhikr":"Последние сохраненные зикры"
+    }

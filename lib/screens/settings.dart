@@ -1,14 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/generated/locale_keys.g.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../main.dart';
 
-class Settings extends StatefulWidget {
+class Settings extends StatelessWidget {
   const Settings({Key? key}) : super(key: key);
 
-  @override
-  State<Settings> createState() => SettingsPage();
-}
-
-class SettingsPage extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,10 +62,10 @@ class SettingsPage extends State<Settings> {
                           child: Column(
                             children: [
                               Row(
-                                children: const [
+                                children: [
                                   Text(
-                                    'Settings',
-                                    style: TextStyle(
+                                    LocaleKeys.settings.tr(),
+                                    style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
@@ -103,18 +102,50 @@ class SettingsPage extends State<Settings> {
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
+                              children: [
                                 Text(
-                                  'Language',
-                                  style: TextStyle(
+                                  LocaleKeys.language.tr(),
+                                  style: const TextStyle(
                                       fontSize: 16, color: Colors.black),
                                 ),
-                                Text(
-                                  'English',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(255, 2, 75, 202)),
+                                SizedBox(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        child: TextButton(
+                                          onPressed: () {
+                                            context
+                                                .setLocale(const Locale('en'));
+                                          },
+                                          child: const Text(
+                                            'En',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                      const Text('/'),
+                                      SizedBox(
+                                        width: 45,
+                                        child: TextButton(
+                                          onPressed: () {
+                                            context
+                                                .setLocale(const Locale('ru'));
+                                          },
+                                          child: const Text(
+                                            'Рус',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -140,27 +171,27 @@ class SettingsPage extends State<Settings> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    'Vibration',
-                                    style: TextStyle(
+                                  Text(
+                                    LocaleKeys.vibration.tr(),
+                                    style: const TextStyle(
                                         fontSize: 16, color: Colors.black),
                                   ),
                                   Row(
-                                    children: const [
+                                    children: [
                                       Text(
-                                        'On',
-                                        style: TextStyle(
+                                        LocaleKeys.on.tr(),
+                                        style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: Color.fromARGB(
                                                 255, 2, 75, 202)),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 10,
                                       ),
                                       Text(
-                                        'Off',
-                                        style: TextStyle(
+                                        LocaleKeys.off.tr(),
+                                        style: const TextStyle(
                                             fontSize: 16,
                                             color: Color.fromARGB(
                                                 125, 62, 62, 63)),
@@ -172,6 +203,7 @@ class SettingsPage extends State<Settings> {
                             ),
                           ),
                         ),
+                        const ToggleSoundWidget(),
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Container(
@@ -192,79 +224,27 @@ class SettingsPage extends State<Settings> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    'Sound',
-                                    style: TextStyle(
+                                  Text(
+                                    LocaleKeys.countAsVolumeKeys.tr(),
+                                    style: const TextStyle(
                                         fontSize: 16, color: Colors.black),
                                   ),
                                   Row(
-                                    children: const [
+                                    children: [
                                       Text(
-                                        'On',
-                                        style: TextStyle(
+                                        LocaleKeys.on.tr(),
+                                        style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: Color.fromARGB(
                                                 255, 2, 75, 202)),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 10,
                                       ),
                                       Text(
-                                        'Off',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: Color.fromARGB(
-                                                125, 62, 62, 63)),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Container(
-                            height: 49,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(10)),
-                                color: Colors.white,
-                                border: Border.all(
-                                    width: 1,
-                                    color:
-                                        const Color.fromARGB(31, 63, 60, 60))),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    'Count as volume keys',
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
-                                  ),
-                                  Row(
-                                    children: const [
-                                      Text(
-                                        'On',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 2, 75, 202)),
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        'Off',
-                                        style: TextStyle(
+                                        LocaleKeys.off.tr(),
+                                        style: const TextStyle(
                                             fontSize: 16,
                                             color: Color.fromARGB(
                                                 125, 62, 62, 63)),
@@ -280,6 +260,74 @@ class SettingsPage extends State<Settings> {
                     ),
                   ),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ToggleSoundWidget extends StatelessWidget {
+  const ToggleSoundWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ProviderZikr>();
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        height: 49,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            color: Colors.white,
+            border: Border.all(
+                width: 1, color: const Color.fromARGB(31, 63, 60, 60))),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                LocaleKeys.sound.tr(),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+              ),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => provider.toggleSound(true),
+                    child: Text(
+                      LocaleKeys.on.tr(),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: provider.togglePlayer
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: provider.togglePlayer
+                              ? const Color.fromARGB(255, 2, 75, 202)
+                              : const Color.fromARGB(125, 62, 62, 63)),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  InkWell(
+                    onTap: () => provider.toggleSound(false),
+                    child: Text(
+                      LocaleKeys.off.tr(),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: provider.togglePlayer
+                              ? FontWeight.normal
+                              : FontWeight.bold,
+                          color: provider.togglePlayer
+                              ? const Color.fromARGB(125, 62, 62, 63)
+                              : const Color.fromARGB(255, 2, 75, 202)),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
