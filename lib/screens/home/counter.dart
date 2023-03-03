@@ -51,7 +51,8 @@ class _CounterState extends State<Counter> {
             child: InkWell(
               onTap: () {
                 provider.togglePlayer
-                    ? provider.player.play(provider.currentSound)
+                    ? provider
+                        .playSound() //provider.player.play(provider.currentSound)
                     : null;
                 provider.increment();
               },

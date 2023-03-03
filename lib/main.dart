@@ -80,7 +80,18 @@ class ProviderZikr extends ChangeNotifier {
   bool loadingProvider = true;
   late Box<Zikr> savesZikrs;
   final player = AudioPlayer();
-  AssetSource currentSound = AssetSource('sounds/sound-1.mp3');
+  final List<String> listSounds = [
+    'sound-1.mp3',
+    'sound-2.mp3',
+    'sound-3.mp3',
+    'sound-4.mp3',
+    'sound-5.mp3',
+    'sound-6.mp3'
+  ];
+  //AssetSource currentSound =AssetSource('sounds/sound-1.mp3');
+  String selectedSound = 'sound-1.mp3';
+  AssetSource currentSound = AssetSource('sound-1.mp3');
+
   bool togglePlayer = true;
 
   List<Zikr> listSaveZikrsFromHive = [];
@@ -127,6 +138,17 @@ class ProviderZikr extends ChangeNotifier {
 
     prefs.setBool('togglePlayer', togglePlayer);
     notifyListeners();
+  }
+
+  void changeSound(int index) {
+    currentSound = AssetSource(listSounds[index]);
+    notifyListeners();
+  }
+
+  void playSound() async {
+    if (togglePlayer) {
+      await player.play(currentSound);
+    }
   }
 
   void pushCount(int count) async {
