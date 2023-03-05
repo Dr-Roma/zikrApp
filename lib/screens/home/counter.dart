@@ -49,11 +49,10 @@ class _CounterState extends State<Counter> {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: const Color.fromARGB(255, 2, 75, 202),
             child: InkWell(
-              onTap: () {
-                provider.togglePlayer
-                    ? provider
-                        .playSound() //provider.player.play(provider.currentSound)
-                    : null;
+              onTap: () async {
+                provider.togglePlayer ? provider.playSound() : null;
+                provider.playVibro();
+
                 provider.increment();
               },
               child: SizedBox(

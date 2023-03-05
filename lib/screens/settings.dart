@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/generated/locale_keys.g.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 
@@ -32,7 +34,6 @@ class Settings extends StatelessWidget {
                         ),
                         child: IconButton(
                             onPressed: () {
-                              //Navigator.of(context).pop();
                               context.go('/');
                             },
                             icon: const Icon(
@@ -47,7 +48,6 @@ class Settings extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                  height: 700,
                   width: MediaQuery.of(context).size.width,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -155,60 +155,10 @@ class Settings extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Container(
-                              height: 49,
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      width: 1,
-                                      color: const Color.fromARGB(
-                                          31, 63, 60, 60))),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      LocaleKeys.vibration.tr(),
-                                      style: const TextStyle(
-                                          fontSize: 16, color: Colors.black),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          LocaleKeys.on.tr(),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color.fromARGB(
-                                                  255, 2, 75, 202)),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          LocaleKeys.off.tr(),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Color.fromARGB(
-                                                  125, 62, 62, 63)),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                          const VibrationControl(),
                           const ToggleSoundWidget(),
                           const ListSoundWidget(),
+                          const MyBanner()
                         ],
                       ),
                     ),
@@ -223,6 +173,141 @@ class Settings extends StatelessWidget {
   }
 }
 
+class VibrationControl extends StatefulWidget {
+  const VibrationControl({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<VibrationControl> createState() => _VibrationControlState();
+}
+
+class _VibrationControlState extends State<VibrationControl> {
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ProviderZikr>();
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        height: 49,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            color: Colors.white,
+            border: Border.all(
+                width: 1, color: const Color.fromARGB(31, 63, 60, 60))),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                LocaleKeys.vibration.tr(),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+              ),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => provider.toggleVibro(true),
+                    child: Text(
+                      LocaleKeys.on.tr(),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: provider.toggleVibroPlay
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: provider.toggleVibroPlay
+                              ? const Color.fromARGB(255, 2, 75, 202)
+                              : const Color.fromARGB(125, 62, 62, 63)),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  InkWell(
+                    onTap: () => provider.toggleVibro(false),
+                    child: Text(
+                      LocaleKeys.off.tr(),
+                      style: TextStyle(
+                          fontWeight: provider.toggleVibroPlay
+                              ? FontWeight.normal
+                              : FontWeight.bold,
+                          color: provider.toggleVibroPlay
+                              ? const Color.fromARGB(125, 62, 62, 63)
+                              : const Color.fromARGB(255, 2, 75, 202)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyBanner extends StatefulWidget {
+  const MyBanner({Key? key}) : super(key: key);
+
+  @override
+  State<MyBanner> createState() => _MyBannerState();
+}
+
+class _MyBannerState extends State<MyBanner> {
+  //ios= ca-app-pub-3940256099942544/2934735716
+  //and=
+  final BannerAd myBanner = BannerAd(
+    adUnitId: Platform.isIOS
+        ? 'ca-app-pub-3940256099942544/2934735716'
+        : 'ca-app-pub-3940256099942544/6300978111',
+    size: AdSize.mediumRectangle,
+    request: const AdRequest(),
+    listener: BannerAdListener(
+// Called when an ad is successfully received.
+      onAdLoaded: (Ad ad) => print('Ad loaded.'),
+// Called when an ad request failed.
+      onAdFailedToLoad: (Ad ad, LoadAdError error) {
+// Dispose the ad here to free resources.
+        ad.dispose();
+        print('Ad failed to load: $error');
+      },
+// Called when an ad opens an overlay that covers the screen.
+      onAdOpened: (Ad ad) => print('Ad opened.'),
+// Called when an ad removes an overlay that covers the screen.
+      onAdClosed: (Ad ad) => print('Ad closed.'),
+// Called when an impression occurs on the ad.
+      onAdImpression: (Ad ad) => print('Ad impression.'),
+    ),
+  );
+
+  @override
+  void initState() {
+    myBanner.load();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    myBanner.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.read<ProviderZikr>();
+    return provider.spisok
+        ? Container(
+            margin: const EdgeInsets.only(top: 20),
+            alignment: Alignment.center,
+            width: myBanner.size.width.toDouble(),
+            height: myBanner.size.height.toDouble(),
+            child: AdWidget(ad: myBanner),
+          )
+        : const SizedBox.shrink();
+  }
+}
+
 class ListSoundWidget extends StatefulWidget {
   const ListSoundWidget({
     Key? key,
@@ -233,14 +318,21 @@ class ListSoundWidget extends StatefulWidget {
 }
 
 class _ListSoundWidgetState extends State<ListSoundWidget> {
-  bool spisok = true;
-  List<bool> isSelected = List.filled(10, false);
+  final _bannerKey = GlobalKey<_MyBannerState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _bannerKey;
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ProviderZikr>();
+    final provider1 = context.read<ProviderZikr>();
     return Padding(
       padding: const EdgeInsets.only(top: 10),
-      child: spisok
+      child: provider1.spisok
           ? Container(
               height: 49,
               width: MediaQuery.of(context).size.width,
@@ -263,7 +355,7 @@ class _ListSoundWidgetState extends State<ListSoundWidget> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                spisok = false;
+                                provider1.spisok = false;
                               });
                             },
                             child: const Text(
@@ -301,7 +393,7 @@ class _ListSoundWidgetState extends State<ListSoundWidget> {
                         IconButton(
                             onPressed: () {
                               setState(() {
-                                spisok = true;
+                                provider1.spisok = true;
                               });
                             },
                             icon: const Icon(
@@ -319,19 +411,15 @@ class _ListSoundWidgetState extends State<ListSoundWidget> {
                             height: 35,
                             child: InkWell(
                               onTap: () {
-                                setState(() {
-                                  isSelected = List.generate(
-                                      isSelected.length, (index) => false);
-                                  isSelected[index] = true;
-                                });
+                                provider1.onSoundSelected(index, provider);
+                                provider.playSound();
                               },
                               child: ListTile(
                                 title: Text(
                                   provider.listSounds[index],
                                   style: TextStyle(
-                                      color: isSelected[index]
-                                          ? const Color.fromARGB(
-                                              255, 2, 75, 202)
+                                      color: provider.isSelected[index]
+                                          ? provider1.selectedColor
                                           : Colors.black),
                                 ),
                               ),

@@ -1,12 +1,13 @@
-//import 'package:audioplayers/audioplayers.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/service/zikr_hive_adapter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vibration/vibration.dart';
 import 'generated/codegen_loader.g.dart';
 import 'models/zikr.dart';
 import 'screens/home/home.dart';
@@ -34,7 +35,7 @@ final GoRouter _router = GoRouter(
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Hive.initFlutter();
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(ZikrHiveAdapter());
@@ -74,6 +75,7 @@ class MyApp extends StatelessWidget {
 
 class ProviderZikr extends ChangeNotifier {
   final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
+  bool spisok = true;
   bool activity = true;
   final String keyCounter = 'counter';
   int counter = 0;
@@ -88,11 +90,15 @@ class ProviderZikr extends ChangeNotifier {
     'sound-5.mp3',
     'sound-6.mp3'
   ];
-  //AssetSource currentSound =AssetSource('sounds/sound-1.mp3');
+
   String selectedSound = 'sound-1.mp3';
   AssetSource currentSound = AssetSource('sound-1.mp3');
+  Color selectedColor = Colors.blue;
 
   bool togglePlayer = true;
+  bool toggleVibroPlay = true;
+  bool hasVibro = true;
+  List<bool> isSelected = List.filled(10, false);
 
   List<Zikr> listSaveZikrsFromHive = [];
 
@@ -103,6 +109,15 @@ class ProviderZikr extends ChangeNotifier {
   Future<void> preloadData() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey(keyCounter)) counter = prefs.getInt(keyCounter)!;
+
+    if (prefs.containsKey('selectedSound')) {
+      selectedSound = prefs.getString('selectedSound')!;
+      currentSound = AssetSource(selectedSound);
+    }
+
+    if (prefs.containsKey('selectedColor')) {
+      selectedColor = Color(prefs.getInt('selectedColor')!);
+    }
 
     preloadZikrsFromHive();
     loadingProvider = false;
@@ -140,6 +155,21 @@ class ProviderZikr extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleVibro(bool vibro) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    toggleVibroPlay = vibro;
+
+    prefs.setBool('toggleVibroPlay', toggleVibroPlay);
+    notifyListeners();
+  }
+
+  void playVibro() async {
+    if (toggleVibroPlay) hasVibro = await Vibration.hasVibrator() ?? false;
+
+    if (hasVibro) Vibration.vibrate();
+  }
+
   void changeSound(int index) {
     currentSound = AssetSource(listSounds[index]);
     notifyListeners();
@@ -149,6 +179,17 @@ class ProviderZikr extends ChangeNotifier {
     if (togglePlayer) {
       await player.play(currentSound);
     }
+  }
+
+  void setSound(String sound) {
+    selectedSound = sound;
+    currentSound = AssetSource(sound);
+    notifyListeners();
+  }
+
+  void onSoundSelected(int index, ProviderZikr provider) {
+    isSelected = List.generate(isSelected.length, (i) => i == index);
+    provider.setSound(provider.listSounds[index]);
   }
 
   void pushCount(int count) async {
