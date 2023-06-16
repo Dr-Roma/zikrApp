@@ -1,6 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/firebase_options.dart';
 import 'package:flutter_application_1/service/zikr_hive_adapter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -10,31 +12,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'generated/codegen_loader.g.dart';
 import 'models/zikr.dart';
+import 'screens/auth/account_screen.dart';
 import 'screens/home/home.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/reset_password_screen.dart';
 import 'screens/settings.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/auth/verifity_email_screen.dart';
+import 'service/firebase_stream.dart';
 
-final GoRouter _router = GoRouter(
-  routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return const Home();
-      },
-      routes: <RouteBase>[
-        GoRoute(
-          path: 'settings',
-          builder: (BuildContext context, GoRouterState state) {
-            return const Settings();
-          },
-        ),
-      ],
-    ),
-  ],
-);
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   MobileAds.instance.initialize();
   await Hive.initFlutter();
   if (!Hive.isAdapterRegistered(0)) {
@@ -50,6 +40,62 @@ void main() async {
     child: const MyApp(),
   ));
 }
+
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const FirebaseStream();
+      },
+      routes: <RouteBase>[
+        GoRoute(
+          path: 'home',
+          builder: (BuildContext context, GoRouterState state) {
+            return const Home();
+          },
+        ),
+        GoRoute(
+          path: 'settings',
+          builder: (BuildContext context, GoRouterState state) {
+            return const Settings();
+          },
+        ),
+        GoRoute(
+          path: 'accountScreen',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AccountScreen();
+          },
+        ),
+        GoRoute(
+            path: 'loginScreen',
+            builder: (BuildContext context, GoRouterState state) {
+              return const LoginScreen();
+            },
+            routes: [
+              GoRoute(
+                path: 'signupScreen',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const SignUpScreen();
+                },
+              ),
+              GoRoute(
+                path: 'resetPasswordScreen',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const ResetPasswordScreen();
+                },
+              ),
+              GoRoute(
+                path: 'verifityEmailScreen',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const VerifyEmailScreen();
+                },
+              ),
+            ]),
+      ],
+    ),
+  ],
+);
 
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -79,6 +125,7 @@ class ProviderZikr extends ChangeNotifier {
   bool activity = true;
   final String keyCounter = 'counter';
   int counter = 0;
+  bool accountSet = true;
   bool loadingProvider = true;
   late Box<Zikr> savesZikrs;
   final player = AudioPlayer();

@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/generated/locale_keys.g.dart';
 import 'package:flutter_application_1/main.dart';
@@ -6,6 +7,8 @@ import 'package:flutter_application_1/screens/home/savesHive.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../models/zikr.dart';
+import '../auth/account_screen.dart';
+import '../auth/login_screen.dart';
 import 'counter.dart';
 
 class Home extends StatelessWidget {
@@ -16,6 +19,7 @@ class Home extends StatelessWidget {
     final activity = context.watch<ProviderZikr>().activity;
     TextEditingController controller = TextEditingController();
     final counter = context.watch<ProviderZikr>().counter;
+    final user = FirebaseAuth.instance.currentUser;
 
     final provaiderZikr = context.read<ProviderZikr>();
     return Scaffold(
@@ -96,6 +100,36 @@ class Home extends StatelessWidget {
                         ],
                       ),
                     ),
+                    Container(
+                        height: 38,
+                        width: 54,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Colors.white,
+                        ),
+                        child: IconButton(
+                            onPressed: () {
+                              if ((user == null)) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const LoginScreen()),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AccountScreen()),
+                                );
+                              }
+                            },
+                            icon: Icon(
+                              Icons.person,
+                              color:
+                                  (user == null) ? Colors.black : Colors.blue,
+                            ))),
                     Container(
                         height: 38,
                         width: 54,

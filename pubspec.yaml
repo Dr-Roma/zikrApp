@@ -47,6 +47,10 @@ dependencies:
   audioplayers: ^3.0.1
   vibration: ^1.7.6
   google_mobile_ads: ^2.3.0
+  firebase_core: ^2.7.0
+  firebase_auth: ^4.2.10
+  email_validator: ^2.1.17
+  
   
 flutter_native_splash:
   color: "#42a5f5"

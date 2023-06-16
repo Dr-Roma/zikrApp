@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "534904114781",
+    "project_id": "auth-zikrap",
+    "storage_bucket": "auth-zikrap.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534904114781:android:fe96a4e1f0c74afab687b4",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534904114781-rrlfuf3ghn7bsemun3l0bm3ibjntsel3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsW0M-8GSN6ckK1shloECcRrHLUzmlS5E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534904114781-rrlfuf3ghn7bsemun3l0bm3ibjntsel3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "534904114781-695us18fs7nnq94nqahtaf2mn4q8qj96.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterApplication1"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
